@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Nexvy",
+    "slug": "nexvy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "nexvy",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0b0b0b"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.nexvy.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Nexvy uses your camera to scan barcodes and analyse meal photos for nutrition tracking.",
+        "NSPhotoLibraryUsageDescription": "Nexvy accesses your photo library to analyse meal photos for nutrition tracking.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Nexvy tracks your location in the background to map your runs and walks.",
+        "NSLocationWhenInUseUsageDescription": "Nexvy uses your location to track your outdoor activities.",
+        "NSHealthShareUsageDescription": "Nexvy reads your HealthKit data to sync workouts and activity rings.",
+        "NSHealthUpdateUsageDescription": "Nexvy writes workout data to HealthKit for your health records.",
+        "NSUserTrackingUsageDescription": "Nexvy uses this identifier to improve your experience.",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ],
+        "CFBundleDisplayName": "Nexvy"
+      }
+    },
+    "android": {
+      "package": "com.nexvy.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0b0b0b"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-camera",
+      "expo-image-picker",
+      "expo-location",
+      "expo-notifications",
+      "expo-sensors",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
