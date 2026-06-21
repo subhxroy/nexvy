@@ -47,8 +47,8 @@ export default function FoodLogScreen() {
       )
     : DEMO_FOODS;
 
-  const handleAddFood = useCallback((food: typeof DEMO_FOODS[0]) => {
-    addFoodItem(selectedMealType, {
+  const handleAddFood = useCallback(async (food: typeof DEMO_FOODS[0]) => {
+    await addFoodItem(selectedMealType, {
       foodId: food.id,
       name: food.name,
       brandName: food.brandName,

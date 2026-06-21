@@ -36,20 +36,24 @@ export async function scheduleWorkoutReminder(
   hour: number,
   minute: number,
   daysOfWeek: number[]
-): Promise<string> {
-  const id = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Time to Train',
-      body: "You've got a workout waiting. Let's go!",
-    },
-    trigger: {
-      weekday: daysOfWeek[0] ?? 2,
-      hour,
-      minute,
-      repeats: true,
-    },
-  });
-  return id;
+): Promise<string[]> {
+  const ids: string[] = [];
+  for (const day of daysOfWeek) {
+    const id = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Time to Train',
+        body: "You've got a workout waiting. Let's go!",
+      },
+      trigger: {
+        weekday: day,
+        hour,
+        minute,
+        repeats: true,
+      },
+    });
+    ids.push(id);
+  }
+  return ids;
 }
 
 export async function scheduleMealReminder(

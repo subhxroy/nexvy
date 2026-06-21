@@ -26,7 +26,8 @@ export function useHealthKit(): UseHealthKitReturn {
 
     async function checkAvailability() {
       try {
-        const healthModule = require('expo-health');
+        // eslint-disable-next-line import/no-unresolved
+        const healthModule = await import('expo-health');
         const isSupported = await healthModule.isHealthDataAvailable();
         setIsAvailable(isSupported);
       } catch {
@@ -41,7 +42,8 @@ export function useHealthKit(): UseHealthKitReturn {
     if (Platform.OS !== 'ios' || !isAvailable) return false;
 
     try {
-      const healthModule = require('expo-health');
+      // eslint-disable-next-line import/no-unresolved
+      const healthModule = await import('expo-health');
       const granted = await healthModule.requestHealthPermissions([
         'workout',
         'activeEnergyBurned',
@@ -60,7 +62,8 @@ export function useHealthKit(): UseHealthKitReturn {
       if (Platform.OS !== 'ios' || !isAvailable) return false;
 
       try {
-        const healthModule = require('expo-health');
+        // eslint-disable-next-line import/no-unresolved
+        const healthModule = await import('expo-health');
         await healthModule.saveWorkout({
           type: workout.type,
           startDate: new Date(),

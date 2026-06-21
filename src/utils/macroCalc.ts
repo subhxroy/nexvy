@@ -25,7 +25,10 @@ export function calculateBMR(
   if (sex === 'female') {
     return base - 161;
   }
-  return base + 5;
+  if (sex === 'male') {
+    return base + 5;
+  }
+  return base + (5 - 161) / 2;
 }
 
 export function calculateTDEE(
@@ -45,10 +48,18 @@ export function calculateCalorieTarget(
   age: number,
   sex: 'male' | 'female' | 'other',
   activityLevel: ActivityLevel,
-  goal: FitnessGoal
+  goal: FitnessGoal | FitnessGoal[]
 ): number {
   const tdee = calculateTDEE(weightKg, heightCm, age, sex, activityLevel);
-  const adjustment = GOAL_ADJUSTMENTS[goal];
+  let adjustment = 0;
+  if (Array.isArray(goal)) {
+    if (goal.length > 0) {
+      const sum = goal.reduce((acc, g) => acc + (GOAL_ADJUSTMENTS[g] ?? 0), 0);
+      adjustment = Math.round(sum / goal.length);
+    }
+  } else {
+    adjustment = GOAL_ADJUSTMENTS[goal] ?? 0;
+  }
   return Math.round(tdee + adjustment);
 }
 
@@ -74,7 +85,7 @@ export function calculateAllMacros(
   age: number,
   sex: 'male' | 'female' | 'other',
   activityLevel: ActivityLevel,
-  goal: FitnessGoal
+  goal: FitnessGoal | FitnessGoal[]
 ): {
   bmr: number;
   tdee: number;

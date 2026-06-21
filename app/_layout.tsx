@@ -9,6 +9,10 @@ import { useAuth } from '../src/hooks/useAuth';
 import { View } from 'react-native';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ErrorBoundary } from '../src/components/ui/ErrorBoundary';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Toast } from '../src/components/ui/Toast';
+import { useToastStore } from '../src/stores/useToastStore';
+import '../src/tasks/backgroundLocationTask';
 import '../src/global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -37,7 +41,7 @@ function RootLayout() {
   }, [isAuthenticated, isOnboarded, isLoading]);
 
   return (
-    <View className="flex-1 bg-[#0b0b0b]">
+    <View className="flex-1 bg-canvas">
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="index" />
@@ -50,16 +54,25 @@ function RootLayout() {
   );
 }
 
+function ToastRenderer() {
+  const { visible, message, type, hideToast } = useToastStore();
+  return <Toast visible={visible} message={message} type={type} onHide={hideToast} />;
+}
+
 export default function AppLayout() {
   return (
     <ErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <QueryClientProvider client={queryClient}>
-          <BottomSheetModalProvider>
-            <RootLayout />
-          </BottomSheetModalProvider>
+          <SafeAreaProvider>
+            <BottomSheetModalProvider>
+              <RootLayout />
+              <ToastRenderer />
+            </BottomSheetModalProvider>
+          </SafeAreaProvider>
         </QueryClientProvider>
       </GestureHandlerRootView>
     </ErrorBoundary>
   );
 }
+

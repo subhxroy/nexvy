@@ -33,7 +33,7 @@ export function Avatar({
           width: size,
           height: size,
           borderWidth: showRing ? 2 : 0,
-          borderColor: showRing ? '#f36458' : 'transparent',
+          borderColor: showRing ? '#FF5722' : 'transparent',
         }}
       >
         <Image
@@ -46,17 +46,17 @@ export function Avatar({
 
   return (
     <View
-      className={`rounded-full bg-[#353535] items-center justify-center ${className}`}
+      className={`rounded-full bg-graphite items-center justify-center ${className}`}
       style={{
         width: size,
         height: size,
         borderWidth: showRing ? 2 : 0,
-        borderColor: showRing ? '#f36458' : 'transparent',
+        borderColor: showRing ? '#FF5722' : 'transparent',
       }}
     >
       <Text
         style={{ fontSize, lineHeight: fontSize * 1.2 }}
-        className="text-white font-medium"
+        className="text-text-primary font-medium"
       >
         {initials || '?'}
       </Text>

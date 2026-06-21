@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,6 +30,7 @@ export default function EditProfileScreen() {
       router.back();
     } catch (error) {
       console.error('Failed to update profile:', error);
+      Alert.alert('Save Failed', 'Could not update profile. Please try again.');
     } finally {
       setIsSaving(false);
     }

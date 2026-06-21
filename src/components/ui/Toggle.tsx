@@ -1,10 +1,10 @@
 import { TouchableOpacity, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
-  withTiming,
+  withSpring,
   useSharedValue,
 } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 interface ToggleProps {
   value: boolean;
@@ -16,21 +16,30 @@ export function Toggle({ value, onValueChange, disabled = false }: ToggleProps) 
   const translateX = useSharedValue(value ? 20 : 0);
 
   useEffect(() => {
-    translateX.value = withTiming(value ? 20 : 0, { duration: 200 });
+    translateX.value = withSpring(value ? 20 : 0, { damping: 15, stiffness: 180 });
   }, [value]);
 
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
 
+  const handlePress = useCallback(() => {
+    if (disabled) return;
+    import('expo-haptics').then((Haptics) => {
+      Haptics.selectionAsync();
+    }).catch(() => {});
+    onValueChange(!value);
+  }, [value, onValueChange, disabled]);
+
   return (
     <TouchableOpacity
-      onPress={() => !disabled && onValueChange(!value)}
+      onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
       className={`
         w-12 h-7 rounded-full justify-center px-0.5
         ${value ? 'bg-[#37cd84]' : 'bg-[#353535]'}
+        ${disabled ? 'opacity-50' : ''}
       `}
     >
       <Animated.View
@@ -40,3 +49,4 @@ export function Toggle({ value, onValueChange, disabled = false }: ToggleProps) 
     </TouchableOpacity>
   );
 }
+

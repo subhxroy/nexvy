@@ -3,6 +3,7 @@ import { onAuthChange } from '../services/firebase/auth';
 import { getDocument } from '../services/firebase/firestore';
 import { useAuthStore } from '../stores/useAuthStore';
 import { UserProfile } from '../types/user.types';
+import { seedUserExercisesIfMissing } from '../services/firebase/seedExercises';
 
 export function useAuth() {
   const { user, profile, isLoading, isOnboarded, setUser, setProfile, setOnboarded } = useAuthStore();
@@ -17,6 +18,8 @@ export function useAuth() {
           if (userProfile) {
             setProfile(userProfile);
             setOnboarded(userProfile.isOnboarded ?? false);
+            // Seed the exercise library if it hasn't been set up yet
+            seedUserExercisesIfMissing(firebaseUser.uid);
           } else {
             setOnboarded(false);
           }
@@ -37,3 +40,4 @@ export function useAuth() {
     isAuthenticated: !!user,
   };
 }
+

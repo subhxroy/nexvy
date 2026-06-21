@@ -3,7 +3,7 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
-  View,
+  Platform,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -55,44 +55,53 @@ export function Button({
     switch (variant) {
       case 'primary':
         return {
-          bg: 'bg-white',
-          text: 'text-[#0b0b0b]',
-          disabledBg: 'bg-[#353535]',
-          disabledText: 'text-[#797979]',
+          bg: 'bg-brand',
+          text: 'text-white',
+          disabledBg: 'bg-graphite',
+          disabledText: 'text-mute',
         };
       case 'brand':
         return {
-          bg: 'bg-[#f36458]',
-          text: 'text-[#0b0b0b]',
-          disabledBg: 'bg-[#353535]',
-          disabledText: 'text-[#797979]',
+          bg: 'bg-brand',
+          text: 'text-white',
+          disabledBg: 'bg-graphite',
+          disabledText: 'text-mute',
         };
       case 'secondary':
         return {
-          bg: 'bg-[#212121] border border-[#353535]',
-          text: 'text-[#b9b9b9]',
-          disabledBg: 'bg-[#212121] border border-[#353535]',
-          disabledText: 'text-[#797979]',
+          bg: 'bg-surface border border-border/80',
+          text: 'text-text-primary',
+          disabledBg: 'bg-surface border border-border/80',
+          disabledText: 'text-mute',
         };
       case 'ghost':
         return {
           bg: 'bg-transparent',
-          text: 'text-[#b9b9b9]',
+          text: 'text-text-secondary',
           disabledBg: 'bg-transparent',
-          disabledText: 'text-[#797979]',
+          disabledText: 'text-mute',
         };
     }
   }, [variant]);
 
+  const handlePress = useCallback(() => {
+    if (Platform.OS !== 'web' && (variant === 'primary' || variant === 'brand')) {
+      import('expo-haptics').then((Haptics) => {
+        Haptics.selectionAsync();
+      }).catch(() => {});
+    }
+    onPress();
+  }, [onPress, variant]);
+
   return (
     <AnimatedTouchable
-      onPress={onPress}
+      onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled || loading}
       activeOpacity={1}
       className={`
-        h-[52px] rounded-full items-center justify-center flex-row px-6
+        h-[52px] rounded-card items-center justify-center flex-row px-6
         ${disabled ? styleConfig.disabledBg : styleConfig.bg}
         ${className}
       `}
@@ -101,7 +110,7 @@ export function Button({
       {loading && (
         <ActivityIndicator
           size="small"
-          color={disabled ? colors.mute : variant === 'ghost' ? colors.ash : colors.canvas}
+          color={disabled ? colors.mute : colors.onPrimary}
           className="mr-2"
         />
       )}

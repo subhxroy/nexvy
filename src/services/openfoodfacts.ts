@@ -1,5 +1,6 @@
 import { FoodItem } from '../types/nutrition.types';
 import { queryClient } from '../lib/queryClient';
+import { Timestamp } from 'firebase/firestore';
 
 interface OpenFoodFactsProduct {
   product_name?: string;
@@ -47,7 +48,7 @@ async function fetchBarcodeFromNetwork(barcode: string): Promise<FoodItem> {
       carbs: nutriments['carbohydrates_100g'] ?? 0,
       fat: nutriments['fat_100g'] ?? 0,
     },
-    loggedAt: undefined as any,
+    loggedAt: Timestamp.fromDate(new Date()),
     source: 'barcode',
   };
 }

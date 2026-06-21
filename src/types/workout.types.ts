@@ -14,6 +14,7 @@ export interface ExerciseEntry {
   name: string;
   muscleGroup: string;
   sets: SetEntry[];
+  supersetId?: string | null;
 }
 
 export interface Workout {
@@ -31,6 +32,7 @@ export interface ActiveWorkout {
   name: string;
   startedAt: number;
   exercises: ExerciseEntry[];
+  notes?: string;
 }
 
 export interface WorkoutTemplate {

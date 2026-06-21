@@ -74,9 +74,9 @@ export default function SnapScreen() {
     await analyze(testBase64, preset.name);
   }, [analyze]);
 
-  const handleAddResult = useCallback(() => {
+  const handleAddResult = useCallback(async () => {
     if (!result) return;
-    addFoodItem(selectedMealType, {
+    await addFoodItem(selectedMealType, {
       foodId: 'ai-' + Date.now(),
       name: result.name,
       brandName: '',

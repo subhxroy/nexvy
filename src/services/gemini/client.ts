@@ -29,7 +29,8 @@ interface GeminiResponse {
 
 export async function generateContent(
   prompt: string,
-  imageBase64?: string
+  imageBase64?: string,
+  systemPrompt?: string
 ): Promise<string> {
   if (!GEMINI_API_KEY) {
     throw new Error('Gemini API key not configured');
@@ -43,6 +44,12 @@ export async function generateContent(
     ],
   };
 
+  if (systemPrompt) {
+    requestBody.systemInstruction = {
+      parts: [{ text: systemPrompt }],
+    };
+  }
+
   if (imageBase64) {
     requestBody.contents[0]!.parts.push({
       inlineData: {
@@ -52,6 +59,9 @@ export async function generateContent(
     });
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
   const response = await fetch(
     `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
     {
@@ -60,8 +70,11 @@ export async function generateContent(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
+      signal: controller.signal,
     }
   );
+
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -79,7 +92,11 @@ export async function generateContent(
     throw new Error('No response candidate from Gemini API');
   }
 
-  const text = candidate.content.parts[0]?.text;
+  if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+    throw new Error(`Gemini API blocked response: ${candidate.finishReason}`);
+  }
+
+  const text = candidate?.content?.parts?.[0]?.text;
   if (!text) {
     throw new Error('Empty response from Gemini API');
   }

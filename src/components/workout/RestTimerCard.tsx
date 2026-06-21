@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { Card } from '../ui/Card';
 import { formatDurationFull } from '../../utils/formatters';
 
 interface RestTimerCardProps {
   secondsLeft: number;
-  progress: Animated.SharedValue<number>;
+  progress: SharedValue<number>;
   onSkip: () => void;
 }
 

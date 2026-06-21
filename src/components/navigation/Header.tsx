@@ -24,14 +24,14 @@ export function Header({
 
   return (
     <View
-      className="bg-[#0b0b0b] px-4"
+      className="bg-canvas px-4"
       style={{ paddingTop: insets.top + 8, paddingBottom: 8 }}
     >
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center flex-1">
           {showBack && (
             <TouchableOpacity onPress={onBackPress} className="mr-3">
-              <Ionicons name="chevron-back" size={24} color="#b9b9b9" />
+              <Ionicons name="chevron-back" size={24} color="#808080" />
             </TouchableOpacity>
           )}
           <View>
@@ -40,12 +40,12 @@ export function Header({
                 {subtitle}
               </Text>
             )}
-            <Text className="text-white text-heading-lg font-medium">{title}</Text>
+            <Text className="text-text-primary text-heading-lg font-medium">{title}</Text>
           </View>
         </View>
         {rightAction && (
           <TouchableOpacity onPress={rightAction.onPress} className="p-2">
-            <Ionicons name={rightAction.icon} size={22} color="#b9b9b9" />
+            <Ionicons name={rightAction.icon} size={22} color="#808080" />
           </TouchableOpacity>
         )}
       </View>

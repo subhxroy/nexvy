@@ -32,13 +32,23 @@ export function calculateStreak(workoutDates: string[]): number {
 
 export function getTodayDateString(): string {
   const now = new Date();
-  return formatDateString(now);
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export function getPreviousDateString(dateStr: string): string {
-  const date = new Date(dateStr + 'T00:00:00');
+  const parts = dateStr.split('-');
+  const year = parseInt(parts[0]!, 10);
+  const month = parseInt(parts[1]!, 10) - 1;
+  const day = parseInt(parts[2]!, 10);
+  const date = new Date(year, month, day);
   date.setDate(date.getDate() - 1);
-  return formatDateString(date);
+  const py = date.getFullYear();
+  const pm = (date.getMonth() + 1).toString().padStart(2, '0');
+  const pd = date.getDate().toString().padStart(2, '0');
+  return `${py}-${pm}-${pd}`;
 }
 
 export function formatDateString(date: Date): string {

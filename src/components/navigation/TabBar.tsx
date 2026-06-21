@@ -27,7 +27,7 @@ export function TabBar({ activeTab, onTabPress }: TabBarProps) {
 
   return (
     <View
-      className="bg-[#0b0b0b] border-t border-[#353535]"
+      className="bg-canvas border-t border-border/80"
       style={{ paddingBottom: insets.bottom }}
     >
       <View className="flex-row items-center justify-around h-14">
@@ -43,11 +43,11 @@ export function TabBar({ activeTab, onTabPress }: TabBarProps) {
               <Ionicons
                 name={isActive ? tab.activeIcon : tab.icon}
                 size={22}
-                color={isActive ? '#f36458' : '#797979'}
+                color={isActive ? '#FF5722' : '#525252'}
               />
               <Text
                 className={`text-meta mt-0.5 ${
-                  isActive ? 'text-[#f36458]' : 'text-mute'
+                  isActive ? 'text-brand' : 'text-mute'
                 }`}
               >
                 {tab.label}

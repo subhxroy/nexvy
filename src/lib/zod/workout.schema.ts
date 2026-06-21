@@ -6,6 +6,7 @@ export const setEntrySchema = z.object({
   reps: z.number().int().min(0),
   rpe: z.number().min(1).max(10).nullable(),
   isWarmup: z.boolean(),
+  completedAt: z.any().nullable().optional(),
 });
 
 export const exerciseEntrySchema = z.object({

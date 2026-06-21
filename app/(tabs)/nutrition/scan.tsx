@@ -22,7 +22,7 @@ export default function BarcodeScanScreen() {
 
       try {
         const food = await lookupBarcode(data);
-        addFoodItem(selectedMealType, food);
+        await addFoodItem(selectedMealType, food);
         router.back();
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Product not found';
@@ -81,15 +81,24 @@ export default function BarcodeScanScreen() {
         </View>
 
         <View className="flex-1 items-center justify-center">
-          <View className="w-64 h-64 border-2 border-white/60 rounded-lg" />
-          <Text className="text-white text-body-sm mt-4">
+          <View className="w-64 h-64 relative">
+            {/* Top-Left Corner */}
+            <View className="absolute top-0 left-0 w-5 h-5 border-t-[3px] border-l-[3px] border-[#f36458]" />
+            {/* Top-Right Corner */}
+            <View className="absolute top-0 right-0 w-5 h-5 border-t-[3px] border-r-[3px] border-[#f36458]" />
+            {/* Bottom-Left Corner */}
+            <View className="absolute bottom-0 left-0 w-5 h-5 border-b-[3px] border-l-[3px] border-[#f36458]" />
+            {/* Bottom-Right Corner */}
+            <View className="absolute bottom-0 right-0 w-5 h-5 border-b-[3px] border-r-[3px] border-[#f36458]" />
+          </View>
+          <Text className="text-white text-body-sm mt-6 font-medium">
             Point camera at a barcode
           </Text>
         </View>
 
         {error && (
           <View className="absolute bottom-24 left-4 right-4 bg-[#dd0000] rounded-xl py-3 px-4">
-            <Text className="text-white text-body-sm text-center">{error}</Text>
+            <Text className="text-white text-body-sm text-center font-medium">{error}</Text>
           </View>
         )}
       </CameraView>

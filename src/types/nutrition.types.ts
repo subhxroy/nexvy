@@ -31,6 +31,7 @@ export interface NutritionLog {
   totalCalories: number;
   macros: FoodMacros;
   meals: MealEntry[];
+  waterCups?: number;
 }
 
 export interface AINutritionResult {

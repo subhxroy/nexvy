@@ -2,8 +2,8 @@ import { useEffect, useCallback } from 'react';
 import {
   useSharedValue,
   withTiming,
+  cancelAnimation,
   Easing,
-  runOnJS,
 } from 'react-native-reanimated';
 import { useWorkoutStore } from '../stores/useWorkoutStore';
 
@@ -24,8 +24,10 @@ export function useRestTimer() {
   }, [isResting, restDuration]);
 
   const handleSkipRest = useCallback(() => {
+    cancelAnimation(progress);
+    progress.value = 0;
     skipRest();
-  }, [skipRest]);
+  }, [skipRest, progress]);
 
   return {
     isResting,

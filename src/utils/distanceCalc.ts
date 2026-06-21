@@ -55,6 +55,8 @@ export function calculateCurrentPace(points: GPSPoint[], recentDistanceMeters: n
   const elapsedSeconds = (now - startTime) / 1000;
   if (elapsedSeconds <= 0) return null;
 
+  if (accumulatedDistance < 10) return null;
+
   const paceSecondsPerKm = (elapsedSeconds / accumulatedDistance) * 1000;
   return paceSecondsPerKm;
 }

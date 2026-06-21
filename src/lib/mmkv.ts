@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { StateStorage } from 'zustand/middleware';
 
 interface SimpleStorage {
   set(key: string, value: string | number | boolean): void;
@@ -9,57 +10,72 @@ interface SimpleStorage {
   clearAll(): void;
 }
 
-let storage: SimpleStorage;
+function createSyncStorage(): SimpleStorage {
+  const store = new Map<string, string>();
 
-if (Platform.OS === 'web') {
-  const mockStorage = new Map<string, string>();
-  storage = {
+  return {
+    set: (key, value) => store.set(key, String(value)),
+    getString: (key) => store.get(key),
+    getNumber: (key) => {
+      const val = store.get(key);
+      return val !== undefined ? Number(val) : undefined;
+    },
+    getBoolean: (key) => {
+      const val = store.get(key);
+      return val === 'true' ? true : val === 'false' ? false : undefined;
+    },
+    delete: (key) => store.delete(key),
+    clearAll: () => store.clear(),
+  };
+}
+
+function createWebStorage(): SimpleStorage {
+  return {
     set: (key, value) => {
       if (typeof window !== 'undefined' && window.localStorage) {
         window.localStorage.setItem(key, String(value));
-      } else {
-        mockStorage.set(key, String(value));
       }
     },
     getString: (key) => {
       if (typeof window !== 'undefined' && window.localStorage) {
         return window.localStorage.getItem(key) || undefined;
       }
-      return mockStorage.get(key);
+      return undefined;
     },
     getNumber: (key) => {
       const val = typeof window !== 'undefined' && window.localStorage
         ? window.localStorage.getItem(key)
-        : mockStorage.get(key);
+        : undefined;
       return val ? Number(val) : undefined;
     },
     getBoolean: (key) => {
       const val = typeof window !== 'undefined' && window.localStorage
         ? window.localStorage.getItem(key)
-        : mockStorage.get(key);
+        : undefined;
       return val === 'true' ? true : val === 'false' ? false : undefined;
     },
     delete: (key) => {
       if (typeof window !== 'undefined' && window.localStorage) {
         window.localStorage.removeItem(key);
-      } else {
-        mockStorage.delete(key);
       }
     },
     clearAll: () => {
       if (typeof window !== 'undefined' && window.localStorage) {
         window.localStorage.clear();
-      } else {
-        mockStorage.clear();
       }
     },
   };
-} else {
-  const { MMKV } = require('react-native-mmkv');
-  storage = new MMKV({
-    id: 'nexvy-storage',
-  });
 }
+
+const storage: SimpleStorage = Platform.OS === 'web'
+  ? createWebStorage()
+  : createSyncStorage();
+
+export const zustandStorage: StateStorage = {
+  setItem: (name, value) => storage.set(name, value),
+  getItem: (name) => storage.getString(name) ?? null,
+  removeItem: (name) => storage.delete(name),
+};
 
 export const mmkvKeys = {
   NUTRITION_TODAY_CACHE: 'nutrition_today_cache',
@@ -69,4 +85,3 @@ export const mmkvKeys = {
 } as const;
 
 export { storage };
-

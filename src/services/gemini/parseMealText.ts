@@ -17,7 +17,7 @@ Estimate portion sizes based on standard servings. Be accurate with nutritional 
 
 export async function parseMealText(description: string): Promise<AINutritionResult> {
   const prompt = `Meal description: "${description}"\n\nReturn the nutritional analysis as JSON.`;
-  const rawResponse = await generateContent(prompt);
+  const rawResponse = await generateContent(prompt, undefined, SYSTEM_PROMPT);
 
   let cleanedResponse = rawResponse.trim();
   if (cleanedResponse.startsWith('```json')) {

@@ -8,6 +8,7 @@ import { MonoLabel } from '../../src/components/ui/MonoLabel';
 import { ActivityLevel } from '../../src/types/user.types';
 
 import { useProfileStore } from '../../src/stores/useProfileStore';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const levels: { key: ActivityLevel; label: string; description: string }[] = [
   { key: 'sedentary', label: 'Sedentary', description: 'Little or no exercise' },
@@ -71,78 +72,80 @@ export default function ActivityLevelScreen() {
       await createDocument('users', profileData, user.uid);
       setProfile(profileData);
       setProfileStore(profileData);
+      setOnboarded(true);
+      router.replace('/(tabs)/home');
     } catch (error) {
       console.error('Failed to create profile:', error);
     } finally {
       setIsLoading(false);
-      setOnboarded(true);
-      router.replace('/(tabs)/home');
     }
   };
 
   return (
-    <View className="flex-1 bg-[#0b0b0b] px-6 pt-16">
-      <MonoLabel text="STEP 3 OF 3" className="mb-2" />
-      <Text className="text-white text-display-md font-semibold mb-2">
-        Activity Level
-      </Text>
-      <Text className="text-ash text-body-sm mb-8">
-        How active are you?
-      </Text>
+    <SafeAreaView className="flex-1 bg-[#0b0b0b]">
+      <View className="flex-1 px-6 pt-4">
+        <MonoLabel text="STEP 3 OF 3" className="mb-1" />
+        <Text className="text-white text-display-md font-semibold mb-1">
+          Activity Level
+        </Text>
+        <Text className="text-ash text-body-sm mb-4">
+          How active are you?
+        </Text>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="space-y-3 mb-8">
-          {levels.map((level) => {
-            const isSelected = activityLevel === level.key;
-            return (
-              <TouchableOpacity
-                key={level.key}
-                onPress={() => setActivityLevel(level.key)}
-                className={`flex-row items-center p-4 rounded-card ${
-                  isSelected ? 'bg-[#f36458]/20 border border-[#f36458]' : 'bg-[#212121]'
-                }`}
-              >
-                <View
-                  className={`w-6 h-6 rounded-full items-center justify-center mr-4 border-2 ${
-                    isSelected ? 'border-[#f36458] bg-[#f36458]' : 'border-[#797979]'
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          <View className="space-y-2 mb-4">
+            {levels.map((level) => {
+              const isSelected = activityLevel === level.key;
+              return (
+                <TouchableOpacity
+                  key={level.key}
+                  onPress={() => setActivityLevel(level.key)}
+                  className={`flex-row items-center p-2.5 rounded-card ${
+                    isSelected ? 'bg-[#f36458]/20 border border-[#f36458]' : 'bg-[#212121]'
                   }`}
                 >
-                  {isSelected && <View className="w-3 h-3 rounded-full bg-[#0b0b0b]" />}
-                </View>
-                <View className="flex-1">
-                  <Text
-                    className={`text-body font-medium ${
-                      isSelected ? 'text-[#f36458]' : 'text-white'
+                  <View
+                    className={`w-5 h-5 rounded-full items-center justify-center mr-3 border-2 ${
+                      isSelected ? 'border-[#f36458] bg-[#f36458]' : 'border-[#797979]'
                     }`}
                   >
-                    {level.label}
-                  </Text>
-                  <Text className="text-mute text-caption">{level.description}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <View className="flex-row items-center justify-between bg-[#212121] rounded-card p-4">
-          <View className="flex-1">
-            <Text className="text-white text-body-sm font-medium">Enable Notifications</Text>
-            <Text className="text-mute text-caption mt-1">
-              Get reminders for workouts and meals
-            </Text>
+                    {isSelected && <View className="w-2.5 h-2.5 rounded-full bg-[#0b0b0b]" />}
+                  </View>
+                  <View className="flex-1">
+                    <Text
+                      className={`text-body font-medium ${
+                        isSelected ? 'text-[#f36458]' : 'text-white'
+                      }`}
+                    >
+                      {level.label}
+                    </Text>
+                    <Text className="text-mute text-caption">{level.description}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
-          <Toggle value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
-        </View>
-      </ScrollView>
 
-      <View className="py-6">
-        <Button
-          title="Complete Setup"
-          onPress={handleComplete}
-          loading={isLoading}
-          variant="primary"
-        />
+          <View className="flex-row items-center justify-between bg-[#212121] rounded-card p-3">
+            <View className="flex-1">
+              <Text className="text-white text-body-sm font-medium">Enable Notifications</Text>
+              <Text className="text-mute text-caption mt-0.5">
+                Get reminders for workouts and meals
+              </Text>
+            </View>
+            <Toggle value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
+          </View>
+        </ScrollView>
+
+        <View className="py-4">
+          <Button
+            title="Complete Setup"
+            onPress={handleComplete}
+            loading={isLoading}
+            variant="primary"
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

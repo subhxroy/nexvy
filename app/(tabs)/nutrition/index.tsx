@@ -10,6 +10,7 @@ import { CalorieRing } from '../../../src/components/nutrition/CalorieRing';
 import { MacroRow } from '../../../src/components/nutrition/MacroRow';
 import { MealCard } from '../../../src/components/nutrition/MealCard';
 import { ScanActionPills } from '../../../src/components/nutrition/ScanActionPills';
+import { WaterWidget } from '../../../src/components/nutrition/WaterWidget';
 import { MonoLabel } from '../../../src/components/ui/MonoLabel';
 import { MealType } from '../../../src/types/nutrition.types';
 
@@ -17,7 +18,7 @@ export default function NutritionDashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile } = useAuthStore();
-  const { todayLog, isLoading, fetchTodayLog, setSelectedMealType } = useNutrition();
+  const { todayLog, fetchTodayLog, setSelectedMealType, setWaterCups } = useNutrition();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -34,11 +35,19 @@ export default function NutritionDashboardScreen() {
     [router, setSelectedMealType]
   );
 
+  const handleUpdateWaterCups = useCallback(
+    async (cups: number) => {
+      await setWaterCups(cups);
+    },
+    [setWaterCups]
+  );
+
   const calorieTarget = profile?.dailyCalorieTarget ?? 2500;
   const currentCalories = todayLog?.totalCalories ?? 0;
   const macros = todayLog?.macros ?? { protein: 0, carbs: 0, fat: 0 };
   const macroTargets = profile?.macroTargets ?? { protein: 180, carbs: 250, fat: 60 };
   const meals = todayLog?.meals ?? [];
+  const waterCups = todayLog?.waterCups ?? 0;
 
   const getMealCalories = (type: MealType): number => {
     const meal = meals.find((m) => m.mealType === type);
@@ -54,22 +63,36 @@ export default function NutritionDashboardScreen() {
         rightAction={{ icon: 'search-outline', onPress: () => router.push('/(tabs)/nutrition/log') }}
       />
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-        <CalorieRing current={currentCalories} target={calorieTarget} />
-        <MacroRow
-          protein={{ current: macros.protein, target: macroTargets.protein }}
-          carbs={{ current: macros.carbs, target: macroTargets.carbs }}
-          fat={{ current: macros.fat, target: macroTargets.fat }}
-        />
+        {/* Calorie Progress Ring */}
+        <View className="my-2">
+          <CalorieRing current={currentCalories} target={calorieTarget} />
+        </View>
 
-        <ScanActionPills
-          onBarcode={() => router.push('/(tabs)/nutrition/scan')}
-          onPhoto={() => router.push('/(tabs)/nutrition/snap')}
-          onText={() => {
-            setSelectedMealType('breakfast');
-            router.push('/(tabs)/nutrition/log');
-          }}
-        />
+        {/* Macros Breakdown */}
+        <View className="mb-4">
+          <MacroRow
+            protein={{ current: macros.protein, target: macroTargets.protein }}
+            carbs={{ current: macros.carbs, target: macroTargets.carbs }}
+            fat={{ current: macros.fat, target: macroTargets.fat }}
+          />
+        </View>
 
+        {/* AI Snap & Barcode Action Pills */}
+        <View className="mb-4">
+          <ScanActionPills
+            onBarcode={() => router.push('/(tabs)/nutrition/scan')}
+            onPhoto={() => router.push('/(tabs)/nutrition/snap')}
+            onText={() => {
+              setSelectedMealType('breakfast');
+              router.push('/(tabs)/nutrition/log');
+            }}
+          />
+        </View>
+
+        {/* Water Intake Tracker Widget */}
+        <WaterWidget waterCups={waterCups} onUpdateWaterCups={handleUpdateWaterCups} />
+
+        {/* Meals Logs */}
         <MonoLabel text="MEALS" className="mb-3" />
         <MealCard
           mealType="breakfast"

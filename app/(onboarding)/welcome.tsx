@@ -66,8 +66,8 @@ function OnboardingSlide({ slide, index, currentIndex }: { slide: Slide; index: 
   return (
     <View style={{ width }} className="flex-1 items-center justify-center px-8">
       <Animated.View style={animatedStyle} className="items-center">
-        <Text className="text-7xl mb-8">{slide.icon}</Text>
-        <Text className="text-white text-display-md text-center font-semibold mb-4">
+        <Text className="text-6xl mb-4">{slide.icon}</Text>
+        <Text className="text-white text-display-md text-center font-semibold mb-2">
           {slide.title}
         </Text>
         <Text className="text-ash text-body text-center leading-6">
@@ -78,16 +78,55 @@ function OnboardingSlide({ slide, index, currentIndex }: { slide: Slide; index: 
   );
 }
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+function OnboardingDot({ index, currentIndex }: { index: number; currentIndex: Animated.SharedValue<number> }) {
+  const dotStyle = useAnimatedStyle(() => {
+    const scale = interpolate(
+      currentIndex.value,
+      [index - 1, index, index + 1],
+      [1, 1.5, 1],
+      Extrapolation.CLAMP
+    );
+    const opacity = interpolate(
+      currentIndex.value,
+      [index - 1, index, index + 1],
+      [0.3, 1, 0.3],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ scale }],
+    };
+  });
+
+  return (
+    <Animated.View
+      style={dotStyle}
+      className="w-2 h-2 rounded-full bg-white mx-1"
+    />
+  );
+}
+
 export default function WelcomeScreen() {
   const router = useRouter();
   const flatListRef = useRef<FlatList>(null);
   const currentIndex = useSharedValue(0);
   const currentPage = useRef(0);
+  const lastPageRef = useRef(0);
 
   const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const page = event.nativeEvent.contentOffset.x / width;
     currentIndex.value = page;
-    currentPage.current = Math.round(page);
+    const roundedPage = Math.round(page);
+    currentPage.current = roundedPage;
+
+    if (roundedPage !== lastPageRef.current && roundedPage >= 0 && roundedPage < slides.length) {
+      lastPageRef.current = roundedPage;
+      import('expo-haptics').then((Haptics) => {
+        Haptics.selectionAsync();
+      }).catch(() => {});
+    }
   }, []);
 
   const goToFitness = useCallback(() => {
@@ -101,40 +140,15 @@ export default function WelcomeScreen() {
   const DotIndicator = () => {
     return (
       <View className="flex-row justify-center mb-8 space-x-2">
-        {slides.map((_, index) => {
-          const dotStyle = useAnimatedStyle(() => {
-            const scale = interpolate(
-              currentIndex.value,
-              [index - 1, index, index + 1],
-              [1, 1.5, 1],
-              Extrapolation.CLAMP
-            );
-            const opacity = interpolate(
-              currentIndex.value,
-              [index - 1, index, index + 1],
-              [0.3, 1, 0.3],
-              Extrapolation.CLAMP
-            );
-            return {
-              opacity,
-              transform: [{ scale }],
-            };
-          });
-
-          return (
-            <Animated.View
-              key={index}
-              style={dotStyle}
-              className="w-2 h-2 rounded-full bg-white mx-1"
-            />
-          );
-        })}
+        {slides.map((_, index) => (
+          <OnboardingDot key={index} index={index} currentIndex={currentIndex} />
+        ))}
       </View>
     );
   };
 
   return (
-    <View className="flex-1 bg-[#0b0b0b]">
+    <SafeAreaView className="flex-1 bg-[#0b0b0b]">
       <View className="flex-1">
         <FlatList
           ref={flatListRef}
@@ -151,7 +165,7 @@ export default function WelcomeScreen() {
         />
       </View>
 
-      <View className="px-8 pb-12">
+      <View className="px-8 pb-6">
         <DotIndicator />
         <Button
           title="Get Started"
@@ -159,6 +173,6 @@ export default function WelcomeScreen() {
           variant="primary"
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

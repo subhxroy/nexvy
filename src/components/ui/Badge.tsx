@@ -11,20 +11,20 @@ interface BadgeProps {
 export function Badge({ label, variant = 'neutral', className = '' }: BadgeProps) {
   const variantStyles: Record<BadgeVariant, { bg: string; text: string }> = {
     neutral: {
-      bg: 'bg-[#212121]',
-      text: 'text-ash',
+      bg: 'bg-surface',
+      text: 'text-text-secondary',
     },
     filled: {
-      bg: 'bg-[#353535]',
-      text: 'text-white',
+      bg: 'bg-graphite',
+      text: 'text-text-primary',
     },
     brand: {
-      bg: 'bg-[#f36458]',
-      text: 'text-[#0b0b0b]',
+      bg: 'bg-brand',
+      text: 'text-white',
     },
     success: {
-      bg: 'bg-[#37cd84]',
-      text: 'text-[#0b0b0b]',
+      bg: 'bg-success',
+      text: 'text-white',
     },
   };
 

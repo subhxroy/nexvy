@@ -7,10 +7,12 @@ import { exercises, searchExercises, ExerciseDefinition, muscleGroups } from '..
 import { muscleGroupColors, muscleGroupLabels } from '../../../src/constants/muscleGroups';
 import { ExerciseRow } from '../../../src/components/workout/ExerciseRow';
 import { MonoLabel } from '../../../src/components/ui/MonoLabel';
+import { useWorkoutStore } from '../../../src/stores/useWorkoutStore';
 
 export default function ExercisePickerScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const addExercise = useWorkoutStore((s) => s.addExercise);
   const [query, setQuery] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
@@ -24,9 +26,14 @@ export default function ExercisePickerScreen() {
 
   const handleSelect = useCallback(
     (exercise: ExerciseDefinition) => {
+      addExercise({
+        exerciseId: exercise.id,
+        name: exercise.name,
+        muscleGroup: exercise.muscleGroup,
+      });
       router.back();
     },
-    [router]
+    [addExercise, router]
   );
 
   return (

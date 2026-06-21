@@ -6,6 +6,7 @@ import { GPSPoint, ActivityType } from '../types/activity.types';
 import { calculateTotalDistance, calculateCurrentPace, calculateElevationGain } from '../utils/distanceCalc';
 import { addToCollection } from '../services/firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
+import { LOCATION_TASK_NAME } from '../tasks/backgroundLocationTask';
 
 export function useGPSTracking() {
   const {
@@ -23,11 +24,10 @@ export function useGPSTracking() {
     tick,
     setDistance,
     setPace,
+    lastCompletedActivity,
   } = useActivityStore();
 
   const { user } = useAuthStore();
-
-  const locationSubscription = useRef<Location.LocationSubscription | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -44,6 +44,30 @@ export function useGPSTracking() {
     };
   }, [isTracking, tick]);
 
+  const startLocationTask = useCallback(async () => {
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+    if (!isRunning) {
+      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 3000,
+        distanceInterval: 5,
+        foregroundService: {
+          notificationTitle: 'Nexvy Live Run',
+          notificationBody: 'Tracking your route in the background...',
+          notificationColor: '#f36458',
+        },
+        showsBackgroundLocationIndicator: true,
+      });
+    }
+  }, []);
+
+  const stopLocationTask = useCallback(async () => {
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+    if (isRunning) {
+      await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+    }
+  }, []);
+
   const handleStartTracking = useCallback(
     async (type: ActivityType) => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -58,28 +82,13 @@ export function useGPSTracking() {
 
       startTracking(type);
 
-      import('expo-haptics').then((Haptics) => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      });
+      import('expo-haptics').then((Hapsics) => {
+        Hapsics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      }).catch(() => {});
 
-      locationSubscription.current = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          distanceInterval: 5,
-          timeInterval: 3000,
-        },
-        (locationData) => {
-          const point: GPSPoint = {
-            lat: locationData.coords.latitude,
-            lng: locationData.coords.longitude,
-            timestamp: locationData.timestamp,
-            alt: locationData.coords.altitude ?? 0,
-          };
-          addGPSPoint(point);
-        }
-      );
+      await startLocationTask();
     },
-    [startTracking, addGPSPoint]
+    [startTracking, startLocationTask]
   );
 
   useEffect(() => {
@@ -95,10 +104,8 @@ export function useGPSTracking() {
   }, [gpsPoints, setDistance, setPace]);
 
   const handleStopTracking = useCallback(async () => {
-    if (locationSubscription.current) {
-      locationSubscription.current.remove();
-      locationSubscription.current = null;
-    }
+    await stopLocationTask();
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -106,7 +113,7 @@ export function useGPSTracking() {
 
     import('expo-haptics').then((Haptics) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    });
+    }).catch(() => {});
 
     const activity = stopTracking();
     if (activity && user) {
@@ -142,42 +149,25 @@ export function useGPSTracking() {
     }
 
     return activity;
-  }, [stopTracking, user, elapsedSeconds]);
+  }, [stopTracking, user, elapsedSeconds, stopLocationTask]);
 
-  const handlePauseTracking = useCallback(() => {
-    if (locationSubscription.current) {
-      locationSubscription.current.remove();
-      locationSubscription.current = null;
-    }
+  const handlePauseTracking = useCallback(async () => {
+    await stopLocationTask();
     pauseTracking();
-  }, [pauseTracking]);
+  }, [pauseTracking, stopLocationTask]);
 
   const handleResumeTracking = useCallback(
     async (type: ActivityType) => {
       resumeTracking();
-      locationSubscription.current = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          distanceInterval: 5,
-          timeInterval: 3000,
-        },
-        (locationData) => {
-          const point: GPSPoint = {
-            lat: locationData.coords.latitude,
-            lng: locationData.coords.longitude,
-            timestamp: locationData.timestamp,
-            alt: locationData.coords.altitude ?? 0,
-          };
-          addGPSPoint(point);
-        }
-      );
+      await startLocationTask();
     },
-    [resumeTracking, addGPSPoint]
+    [resumeTracking, startLocationTask]
   );
 
   return {
     isTracking,
     currentActivity,
+    lastCompletedActivity,
     elapsedSeconds,
     distanceMeters,
     gpsPoints,

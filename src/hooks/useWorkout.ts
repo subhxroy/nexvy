@@ -21,27 +21,36 @@ export function useWorkout() {
     tickRest,
     endWorkout,
     clearWorkout,
+    toggleSuperset,
+    updateNotes,
+    removeSet,
+    removeExercise,
   } = useWorkoutStore();
 
   const { user } = useAuthStore();
+
+  const isRestingRef = useRef(isResting);
+  const restSecondsLeftRef = useRef(restSecondsLeft);
+  isRestingRef.current = isResting;
+  restSecondsLeftRef.current = restSecondsLeft;
 
   useEffect(() => {
     if (!activeWorkout) return;
 
     const timer = setInterval(() => {
       tick();
-      if (isResting) {
-        if (restSecondsLeft === 1) {
+      if (isRestingRef.current) {
+        if (restSecondsLeftRef.current === 1) {
           import('expo-haptics').then((Haptics) => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          });
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          }).catch(() => {});
         }
         tickRest();
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [activeWorkout, isResting, restSecondsLeft, tick, tickRest]);
+  }, [activeWorkout, tick, tickRest]);
 
   const handleStartWorkout = useCallback(
     (template: WorkoutTemplate) => {
@@ -71,7 +80,7 @@ export function useWorkout() {
         completedAt: Timestamp.fromDate(now),
         durationSeconds: elapsedSeconds,
         totalVolumeKg,
-        notes: '',
+        notes: workout.notes ?? '',
         exercises: workout.exercises.map((ex) => ({
           exerciseId: ex.exerciseId,
           name: ex.name,
@@ -106,5 +115,9 @@ export function useWorkout() {
     startRest,
     skipRest,
     endWorkout: handleEndWorkout,
+    toggleSuperset,
+    updateNotes,
+    removeSet,
+    removeExercise,
   };
 }

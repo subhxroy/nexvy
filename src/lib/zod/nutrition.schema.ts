@@ -13,6 +13,7 @@ export const foodItemSchema = z.object({
   servingGrams: z.number().min(1),
   calories: z.number().min(0),
   macros: foodMacrosSchema,
+  loggedAt: z.any().optional(),
   source: z.enum(['barcode', 'photo_ai', 'text_ai', 'manual']),
 });
 

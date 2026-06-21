@@ -82,13 +82,23 @@ export function useProgress(): UseProgressReturn {
         return date >= monthStart;
       }).length;
 
+      const weekStart = getWeekStart();
+      const weeklyVolume: number[] = [0, 0, 0, 0, 0, 0, 0];
+      for (const w of completedWorkouts) {
+        const d = w.startedAt.toDate();
+        if (d >= weekStart) {
+          const dayIndex = (d.getDay() + 6) % 7;
+          weeklyVolume[dayIndex] += w.totalVolumeKg ?? 0;
+        }
+      }
+
       setWorkoutSummary({
         totalWorkouts: completedWorkouts.length,
         totalVolumeKg,
         totalDurationSeconds,
         streakDays,
         recentWorkouts: completedWorkouts.slice(0, 10),
-        weeklyVolume: [0, 0, 0, 0, 0, 0, 0],
+        weeklyVolume,
         monthlyWorkouts,
       });
 

@@ -1,8 +1,7 @@
 import { View, Text } from 'react-native';
-import { colors } from '../../constants/tokens';
 
 interface WeightChartProps {
-  data: Array<{ date: string; weightKg: number }>;
+  data: { date: string; weightKg: number }[];
 }
 
 export function WeightChart({ data }: WeightChartProps) {
@@ -26,7 +25,7 @@ export function WeightChart({ data }: WeightChartProps) {
         const xPos = (idx / (data.length - 1)) * 100;
         return (
           <View
-            key={point.date}
+            key={`${point.date}-${idx}`}
             className="absolute bottom-0"
             style={{ left: `${xPos}%`, height: `${Math.max(heightPercent, 10)}%`, width: 8 }}
           >

@@ -9,6 +9,8 @@ import { Button } from '../../src/components/ui/Button';
 import { sendPasswordReset } from '../../src/services/firebase/auth';
 import { strings } from '../../src/constants/strings';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -35,11 +37,12 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-[#0b0b0b]"
-    >
-      <View className="flex-1 justify-center px-8">
+    <SafeAreaView className="flex-1 bg-[#0b0b0b]">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
+        <View className="flex-1 justify-center px-8">
         <View className="mb-8">
           <Text className="text-mute text-mono-eyebrow uppercase tracking-widest mb-2">
             RESET PASSWORD
@@ -99,5 +102,6 @@ export default function ForgotPasswordScreen() {
         )}
       </View>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

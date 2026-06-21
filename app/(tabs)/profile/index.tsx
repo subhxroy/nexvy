@@ -13,7 +13,7 @@ import { strings } from '../../../src/constants/strings';
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile, signOut } = useAuthStore();
-  const { workoutSummary, coachReport, isLoading } = useProgress();
+  const { workoutSummary, coachReport } = useProgress();
 
   const handleSignOut = useCallback(async () => {
     try {

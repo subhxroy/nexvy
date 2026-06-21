@@ -23,7 +23,7 @@ export interface UserProfile {
   heightCm: number;
   currentWeightKg: number;
   goalWeightKg: number;
-  fitnessGoal: FitnessGoal;
+  fitnessGoal: FitnessGoal | FitnessGoal[];
   activityLevel: ActivityLevel;
   dailyCalorieTarget: number;
   macroTargets: MacroTargets;

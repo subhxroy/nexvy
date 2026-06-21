@@ -7,6 +7,7 @@ import { useGPSTracking } from '../../../src/hooks/useGPSTracking';
 import { LiveStatRow } from '../../../src/components/activity/LiveStatRow';
 import { RouteTrace } from '../../../src/components/activity/RouteTrace';
 import { Button } from '../../../src/components/ui/Button';
+import { CountdownOverlay } from '../../../src/components/activity/CountdownOverlay';
 
 export default function LiveRunScreen() {
   const router = useRouter();
@@ -24,22 +25,35 @@ export default function LiveRunScreen() {
   } = useGPSTracking();
 
   const [hasStarted, setHasStarted] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleStart = useCallback(async () => {
+  const handleStart = useCallback(() => {
+    setErrorMessage(null);
+    setShowCountdown(true);
+  }, []);
+
+  const handleCountdownComplete = useCallback(async () => {
+    setShowCountdown(false);
     try {
       await startTracking('run');
       setHasStarted(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to start tracking';
-      console.error(message);
+      setErrorMessage(message);
     }
   }, [startTracking]);
 
   const handleStop = useCallback(async () => {
-    stopTracking();
+    await stopTracking();
     setHasStarted(false);
-    router.back();
+    // Push/navigate to summary screen instead of back
+    router.replace('/(tabs)/activity/summary');
   }, [stopTracking, router]);
+
+  if (showCountdown) {
+    return <CountdownOverlay onComplete={handleCountdownComplete} />;
+  }
 
   if (!hasStarted) {
     return (
@@ -59,6 +73,11 @@ export default function LiveRunScreen() {
           <Text className="text-ash text-body-sm text-center mb-8">
             GPS tracking will map your route and log your stats
           </Text>
+          {errorMessage && (
+            <Text className="text-error text-caption text-center mb-4 px-4">
+              {errorMessage}
+            </Text>
+          )}
           <Button title="Start Run" onPress={handleStart} variant="brand" />
         </View>
       </View>
